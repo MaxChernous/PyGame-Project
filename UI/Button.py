@@ -5,7 +5,7 @@ from pygame.sprite import AbstractGroup
 
 class Button(pygame.sprite.Sprite):
 
-    def __init__(self, color, text, *groups: AbstractGroup, image=None, rect=None):
+    def __init__(self, color, *groups: AbstractGroup, image=None, text=pygame.Surface([0, 0]), rect=None):
         self.btn_color, self.btn_text = color, text
         super().__init__(*groups)
         if image:
