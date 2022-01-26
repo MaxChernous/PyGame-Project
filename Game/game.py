@@ -7,6 +7,7 @@ class Weapon(ABC):
         """Use a weapon from position pos and moving with speed"""
         pass
 
+
 class Player:
     def __init__(self):
         self.pos = (0, 0)
@@ -29,19 +30,22 @@ class GameObject(ABC):
         """Interacts with given player"""
         pass
 
+
 class Field:
     def __init__(self):
         self.objects: "set[GameObject]" = set()
 
     def render(self, current_player: Player):
         """Renders all objects on the field"""
+        deleted_objects: "list[GameObject]" = []
+
         for object in self.objects:
             object.interact(current_player)
-            if not object.alive: # Not sure if it works
-                self.objects.remove(object)
+
+            if not object.alive:
+                deleted_objects.append(object)
                 continue
             object.render()
-            
 
-
-    
+        for x in deleted_objects:
+            self.objects.remove(x)
