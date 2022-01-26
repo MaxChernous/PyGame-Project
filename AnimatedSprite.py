@@ -4,13 +4,21 @@ import pygame
 
 
 class AnimatedSprite(pygame.sprite.Sprite):
-    def __init__(self, sheet, columns, rows, x, y, *groups):
+    def __init__(self, sheet, columns, rows, x, y, *groups, stages=None):
         super().__init__(*groups)
         self.frames = []
+        self.stopped = False
+        if stages:
+            self.stages = stages
+        else:
+            self.stages = {"Idle": [0, columns * rows]}
+        self.stage = "Idle"
         self.cut_sheet(sheet, columns, rows)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(x, y)
+        self.x_flipped = False
+        self.y_flipped = False
 
     def cut_sheet(self, sheet, columns, rows):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
@@ -22,8 +30,17 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     frame_location, self.rect.size)))
 
     def update(self, *args):
-        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
-        self.image = self.frames[self.cur_frame]
+        if self.stopped:
+            return
+        self.cur_frame = (self.cur_frame + 1) % (self.stages[self.stage][1] - self.stages[self.stage][0])
+        self.image = pygame.transform.flip(self.frames[self.cur_frame + self.stages[self.stage][0]], self.x_flipped,
+                                           self.y_flipped)
+
+    def flip_x(self):
+        self.x_flipped = False
+
+    def flip_y(self):
+        self.y_flipped = False
 
 
 def load_image(name):
