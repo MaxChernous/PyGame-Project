@@ -44,7 +44,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
 
 def load_image(name):
-    fullname = path.join('data', name)
+    fullname = path.join('../data', name)
     if not path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         exit()

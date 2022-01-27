@@ -2,7 +2,7 @@ from os import path
 
 import pygame
 
-from AnimatedSprite import AnimatedSprite
+from Helpers.AnimatedSprite import AnimatedSprite
 
 
 class Player(AnimatedSprite):
