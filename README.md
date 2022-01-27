@@ -2,7 +2,7 @@
 TODO: Change name
 ## Authors:
 - Черноус Максим
-- Average Enjoyer (TODO: change name to real)
+- Паршин Данил
 - Станислав Алексеев
 
 ## About:
