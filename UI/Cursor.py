@@ -3,6 +3,7 @@ from typing import Any
 import pygame
 
 
+# The Cursor class is a sprite that is used to display the mouse cursor.
 class Cursor(pygame.sprite.Sprite):
     def __init__(self, image: pygame.surface.Surface, *group: pygame.sprite.AbstractGroup):
         super().__init__(*group)

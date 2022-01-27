@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 
+# The Weapon class is an abstract base class that defines a generic way of creating ingame weapons
 class Weapon(ABC):
     @abstractmethod
     def use(self, pos: "tuple[int, int]", speed: "tuple[int, int]"):
@@ -8,6 +9,7 @@ class Weapon(ABC):
         pass
 
 
+# The Player class is a class that represents the player in the game.
 class Player:
     def __init__(self):
         self.pos = (0, 0)
@@ -31,6 +33,7 @@ class GameObject(ABC):
         pass
 
 
+# The Field class is a container for all the objects on the field.
 class Field:
     def __init__(self):
         self.objects: "set[GameObject]" = set()

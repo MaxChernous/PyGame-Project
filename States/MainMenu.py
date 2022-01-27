@@ -4,6 +4,17 @@ from Helpers.helpers import load_image
 from UI.Button import Button
 
 
+# The MainMenu class is a class that creates a menu for the game.
+# 
+# The __init__ method creates the sprites that will be used in the menu.
+# 
+# The display method draws all the sprites to the screen.
+# 
+# The update method updates all the sprites in the menu.
+# 
+# The on_play_click method prints a message when the user clicks on the play button.
+# 
+# The on_leaderboard_click method prints a message when the user clicks on the leaderboard button.
 class MainMenu:
     BTN_INTERVAL = 50
 
@@ -73,13 +84,37 @@ class MainMenu:
         self.menu_image.rect.y = 235
 
     def display(self, screen: pygame.surface.Surface):
+        '''
+        It draws all the sprites in the group to the screen.
+        
+        :param screen: The screen to draw the sprites on
+        :type screen: pygame.surface.Surface
+        '''
         self.all_sprites.draw(screen)
 
     def update(self, event: pygame.event.Event):
+        '''
+        It takes an event and updates all the sprites in the game.
+        
+        :param event: The event that triggered the update
+        :type event: pygame.event.Event
+        '''
         self.all_sprites.update(event)
 
     def on_play_click(self, event: pygame.event.Event):
+        '''
+        When the user clicks on the play button, print a message.
+        
+        :param event: pygame.event.Event
+        :type event: pygame.event.Event
+        '''
         print(event.pos, "Do you want to play?")
 
     def on_leaderboard_click(self, event: pygame.event.Event):
+        '''
+        It prints a message when the user clicks on the leaderboard button.
+        
+        :param event: pygame.event.Event
+        :type event: pygame.event.Event
+        '''
         print(event.pos, "Do you want to see the best score?")
