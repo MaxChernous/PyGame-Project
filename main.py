@@ -1,20 +1,8 @@
-from os import path
-from sys import exit
-
 import pygame
 
+from Helpers.helpers import load_image
 from States.MainMenu import MainMenu
 from UI.Cursor import Cursor
-
-
-def load_image(name):
-    fullname = path.join('data', name)
-    if not path.isfile(fullname):
-        print(f"Файл с изображением '{fullname}' не найден")
-        exit()
-    image = pygame.image.load(fullname)
-    return image
-
 
 if __name__ == '__main__':
     pygame.init()
@@ -25,7 +13,8 @@ if __name__ == '__main__':
     cursor = pygame.sprite.Group()
     game_state = "main menu"
     screen = pygame.display.set_mode(size)
-    cur = Cursor(pygame.transform.scale(load_image("cursor.png"), (50, 50)), cursor)
+    cur = Cursor(pygame.transform.scale(
+        load_image("cursor.png"), (50, 50)), cursor)
     pygame.mouse.set_visible(False)
     running = True
 
