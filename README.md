@@ -1,4 +1,5 @@
 # PyGame-Project
+TODO: Change name
 ## Authors:
 - Черноус Максим
 - Average Enjoyer
