@@ -24,7 +24,7 @@ class MainMenu:
         height = screen.get_height()
 
         game_name_text = pygame.font.Font(None, 75).render(
-            "Name of the Game", True, (255, 255, 100))
+            "Knight in the Gungeon", True, (255, 255, 100))
         game_name_text_x = width // 2 - game_name_text.get_width() // 2 - 250
         game_name_text_y = height // 2 - game_name_text.get_height() // 2 - 300
         game_name_text_w = game_name_text.get_width()
@@ -43,7 +43,7 @@ class MainMenu:
         menu_text = pygame.font.Font(None, 60).render(
             "Main menu", True, (100, 255, 100))
         menu_text_x, menu_text_y = width // 2 - menu_text.get_width() // 2 - \
-            250, game_name_text_y + 150
+                                   250, game_name_text_y + 150
         self.menu_text_sprite = pygame.sprite.Sprite(self.all_sprites)
         self.menu_text_sprite.image = menu_text
         self.menu_text_sprite.rect = menu_text.get_rect()
@@ -55,7 +55,7 @@ class MainMenu:
             "Play", True, (100, 255, 100))
         play_btn_text_w, play_btn_text_h = play_btn_text.get_width(), play_btn_text.get_height()
         play_btn_x, play_btn_y = width // 2 - \
-            play_btn_text_w // 2 - 260, menu_text_y + 130
+                                 play_btn_text_w // 2 - 260, menu_text_y + 130
         self.play_btn = Button(pygame.Color((100, 255, 100)), text=play_btn_text,
                                rect=pygame.rect.Rect(play_btn_x, play_btn_y,
                                                      play_btn_text_w + 20, play_btn_text_h + 20))
@@ -86,7 +86,7 @@ class MainMenu:
     def display(self, screen: pygame.surface.Surface):
         '''
         It draws all the sprites in the group to the screen.
-        
+
         :param screen: The screen to draw the sprites on
         :type screen: pygame.surface.Surface
         '''
@@ -95,7 +95,7 @@ class MainMenu:
     def update(self, event: pygame.event.Event):
         '''
         It takes an event and updates all the sprites in the game.
-        
+
         :param event: The event that triggered the update
         :type event: pygame.event.Event
         '''
@@ -104,7 +104,7 @@ class MainMenu:
     def on_play_click(self, event: pygame.event.Event):
         '''
         When the user clicks on the play button, print a message.
-        
+
         :param event: pygame.event.Event
         :type event: pygame.event.Event
         '''
@@ -113,7 +113,7 @@ class MainMenu:
     def on_leaderboard_click(self, event: pygame.event.Event):
         '''
         It prints a message when the user clicks on the leaderboard button.
-        
+
         :param event: pygame.event.Event
         :type event: pygame.event.Event
         '''
