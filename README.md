@@ -1,5 +1,4 @@
 # PyGame-Project
-TODO: Change name
 ## Authors:
 - Черноус Максим
 - Паршин Данил
