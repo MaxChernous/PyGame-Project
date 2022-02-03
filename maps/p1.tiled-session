@@ -3,17 +3,41 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "map1.tmx",
+    "activeFile": "map2.tmx",
     "expandedProjectPaths": [
         "."
     ],
     "fileStates": {
-        "map1.tmx": {
+        "3.tmx": {
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 282.5,
                 "y": 300
+            }
+        },
+        "map1.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 335.5,
+                "y": 304
+            }
+        },
+        "map2.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 507.5,
+                "y": 357
+            }
+        },
+        "map3.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 337,
+                "y": 304
             }
         },
         "tmw_desert_spacing.tsx": {
@@ -27,13 +51,18 @@
     "map.layerDataFormat": null,
     "map.width": 21,
     "openFiles": [
+        "tmw_desert_spacing.tsx",
         "map1.tmx",
-        "tmw_desert_spacing.tsx"
+        "map2.tmx",
+        "map3.tmx"
     ],
     "project": "p1.tiled-project",
     "recentFiles": [
         "tmw_desert_spacing.tsx",
-        "map1.tmx"
+        "map1.tmx",
+        "map3.tmx",
+        "map2.tmx",
+        "3.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.margin": 1,
