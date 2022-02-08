@@ -61,8 +61,8 @@ class Player(AnimatedSprite):
                     self.y_dir = 0 if self.y_dir > 0 else self.y_dir
                 if event.key == pygame.K_d:
                     self.x_dir = 0 if self.x_dir > 0 else self.x_dir
-        else:
-            self.move()
+        # else:
+            # self.move()
 
     def move(self):
         if self.stage == "Die" or self.stage == "Attack":

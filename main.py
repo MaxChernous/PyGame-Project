@@ -1,7 +1,7 @@
 import pygame
 
 from Helpers.helpers import load_image
-from States.MainMenu import MainMenu
+from States.MainMenu import MainMenu, Game
 from UI.Cursor import Cursor
 
 if __name__ == '__main__':
@@ -24,6 +24,8 @@ if __name__ == '__main__':
         screen.fill('black')
         if game_state == "main menu":
             menu.display(screen)
+        if game_state == "in game":
+            main()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
