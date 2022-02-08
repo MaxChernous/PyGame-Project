@@ -4,6 +4,8 @@ import sys
 import pygame
 import pytmx.pytmx
 
+from zad1 import Player
+
 SIZE = WIDTH, HEIGHT = 672, 608
 FPS = 15
 MAPS_DIR = "maps"
@@ -20,46 +22,6 @@ def load_image(name, colorkey=None):
         sys.exit()
     image = pygame.image.load(fullname)
     return image
-
-
-class AnimatedSprite(pygame.sprite.Sprite):
-    def __init__(self, sheet, columns, rows, x, y, *groups, stages=None):
-        super().__init__(*groups)
-        self.frames = []
-        self.stopped = False
-        if stages:
-            self.stages = stages
-        else:
-            self.stages = {"Idle": [0, columns * rows]}
-        self.stage = "Idle"
-        self.cut_sheet(sheet, columns, rows)
-        self.cur_frame = 0
-        self.image = self.frames[self.cur_frame]
-        self.rect = self.rect.move(x, y)
-        self.x_flipped = False
-        self.y_flipped = False
-
-    def cut_sheet(self, sheet, columns, rows):
-        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
-                                sheet.get_height() // rows)
-        for j in range(rows):
-            for i in range(columns):
-                frame_location = (self.rect.w * i, self.rect.h * j)
-                self.frames.append(sheet.subsurface(pygame.Rect(
-                    frame_location, self.rect.size)))
-
-    def update(self, *args):
-        if self.stopped:
-            return
-        self.cur_frame = (self.cur_frame + 1) % (self.stages[self.stage][1] - self.stages[self.stage][0])
-        self.image = pygame.transform.flip(self.frames[self.cur_frame + self.stages[self.stage][0]], self.x_flipped,
-                                           self.y_flipped)
-
-    def flip_x(self):
-        self.x_flipped = False
-
-    def flip_y(self):
-        self.y_flipped = False
 
 
 class Line(pygame.sprite.Sprite):
@@ -148,22 +110,31 @@ class Labyrinth:
             return start
 
 
-class Hero(pygame.sprite.Sprite):
+class Hero(Player):
     sword_image = load_image("hero_sword_image.png")
     pistol_image = load_image("hero_pistol_image.png")
     rifle_image = load_image("hero_rifle_image.png")
 
-    def __init__(self, group, position, weapon):
-        super().__init__(group)
-        self.image = Hero.sword_image
-        self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
-        self.rect = self.image.get_rect()
-        self.x, self.y = position
-        self.rect.x = self.x * TILE_SIZE
-        self.rect.y = self.y * TILE_SIZE
-        self.mask = pygame.mask.from_surface(self.image)
+    INTERVAL = 120  # milliseconds between animation frame
 
+    def __init__(self, picture, columns, rows, *groups, rect=None, speed=2, weapon, stages=None):
+        if not rect:
+            rect = pygame.Rect(0, 0, picture.get_width() // columns, picture.get_height() // rows)
+        self.rect = rect
+        self.speed = speed
+        self.time = pygame.time.Clock()
+        self.timer = 0
+        self.x_dir = 0
+        self.y_dir = 0
         self.weapon = weapon
+        self.x = rect.x
+        self.y = rect.y
+
+        print(rect.x, rect.y)
+
+        super(Hero, self).__init__(picture, columns, rows, *groups, rect=rect, stages=stages)
+
+        self.stage = "Idle"
 
     def get_position(self):
         return self.x, self.y
@@ -172,6 +143,7 @@ class Hero(pygame.sprite.Sprite):
         self.x, self.y = position
 
     def update(self, screen):
+        super().update()
         if self.weapon == "Sword":
             self.image = Hero.sword_image
         elif self.weapon == "Pistol":
@@ -344,7 +316,12 @@ def main():
     all_sprites = pygame.sprite.Group()
     line_sprite = pygame.sprite.Group()
 
-    hero = Hero(all_sprites, (1, 17), "Sword")
+    hero = Hero(load_image("player.png"), 8, 8, all_sprites, rect=pygame.rect.Rect((1, 17), (TILE_SIZE, TILE_SIZE)),
+                stages={"Walk": [0, 8],
+                        "Idle": [8, 35],
+                        "Attack": [35, 41],
+                        "Silence": [41, 53],
+                        "Die": [54, 64]}, weapon="Sword")
     enemy1 = Enemy(all_sprites, (4, 2), 100, 5)
     enemy2 = Enemy(all_sprites, (5, 17), 100, 5)
     enemy3 = Enemy(all_sprites, (8, 8), 100, 5)
