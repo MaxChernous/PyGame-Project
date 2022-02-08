@@ -1,8 +1,18 @@
 import pygame
 
 from Helpers.helpers import load_image
-from States.MainMenu import MainMenu, Game
+from States.MainMenu import MainMenu
+from States import Gungeon
+
 from UI.Cursor import Cursor
+
+
+class Main:
+    game_state = "main menu"
+
+    def change_state(self, state):
+        self.game_state = state
+
 
 if __name__ == '__main__':
     pygame.init()
@@ -17,15 +27,16 @@ if __name__ == '__main__':
         load_image("cursor.png"), (50, 50)), cursor)
     pygame.mouse.set_visible(False)
     running = True
+    main = Main()
 
-    menu = MainMenu(screen)
+    menu = MainMenu(screen, main=main)
 
     while running:
         screen.fill('black')
-        if game_state == "main menu":
+        if main.game_state == "main menu":
             menu.display(screen)
-        if game_state == "in game":
-            main()
+        if main.game_state == "in game":
+            Gungeon.main()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False

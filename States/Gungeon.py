@@ -1,28 +1,19 @@
 import os
-import sys
 
 import pygame
 import pytmx.pytmx
 
 from Entities.Player import Player
+from Helpers.helpers import load_image
 
 SIZE = WIDTH, HEIGHT = 672, 608
 FPS = 15
-MAPS_DIR = "../maps"
+MAPS_DIR = "maps"
 TILE_SIZE = 32
 ENEMY_EVENT_TYPE = 30
 PISTOL_SPRITE = 39
 RIFLE_SPRITE = 40
 GAME_RESULT = "WIN"
-
-
-def load_image(name, colorkey=None):
-    fullname = os.path.join('../data', name)
-    if not os.path.isfile(fullname):
-        print(f"Файл с изображением '{fullname}' не найден")
-        sys.exit()
-    image = pygame.image.load(fullname)
-    return image
 
 
 class Line(pygame.sprite.Sprite):
@@ -54,7 +45,8 @@ class Line(pygame.sprite.Sprite):
 class Labyrinth:
 
     def __init__(self, filename, free_tiles, finish_tile, cactus_tile, enemies):
-        self.map = pytmx.load_pygame(f"{MAPS_DIR}/{filename}")
+        fullname = os.path.join(MAPS_DIR, filename)
+        self.map = pytmx.load_pygame(fullname)
         self.height = self.map.height
         self.width = self.map.width
         self.tile_size = self.map.tilewidth
@@ -262,8 +254,6 @@ class Game:
             self.hero.stage = "Idle"
         self.hero.set_position((next_x, next_y))
 
-
-
         if self.labyrinth.get_tile_id(self.hero.get_position()) == PISTOL_SPRITE:
             self.hero.weapon = "Pistol"
         elif self.labyrinth.get_tile_id(self.hero.get_position()) == RIFLE_SPRITE:
@@ -336,7 +326,8 @@ def main():
     players = pygame.sprite.Group()
     line_sprite = pygame.sprite.Group()
 
-    hero = Hero(load_image("player.png"), 8, 8, all_sprites, players, rect=pygame.rect.Rect((1, 17), (TILE_SIZE, TILE_SIZE)),
+    hero = Hero(load_image("player.png"), 8, 8, all_sprites, players,
+                rect=pygame.rect.Rect((1, 17), (TILE_SIZE, TILE_SIZE)),
                 stages={"Walk": [0, 8],
                         "Idle": [8, 35],
                         "Attack": [35, 41],

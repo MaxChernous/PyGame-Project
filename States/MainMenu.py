@@ -18,10 +18,11 @@ from UI.Button import Button
 class MainMenu:
     BTN_INTERVAL = 50
 
-    def __init__(self, screen: pygame.surface.Surface):
+    def __init__(self, screen: pygame.surface.Surface, main=None):
         self.all_sprites = pygame.sprite.Group()
         width: int = screen.get_width()
         height = screen.get_height()
+        self.main = main
 
         game_name_text = pygame.font.Font(None, 75).render(
             "Knight in the Gungeon", True, (255, 255, 100))
@@ -93,28 +94,10 @@ class MainMenu:
         self.all_sprites.draw(screen)
 
     def update(self, event: pygame.event.Event):
-        '''
-        It takes an event and updates all the sprites in the game.
-
-        :param event: The event that triggered the update
-        :type event: pygame.event.Event
-        '''
         self.all_sprites.update(event)
 
     def on_play_click(self, event: pygame.event.Event):
-        '''
-        When the user clicks on the play button, print a message.
-
-        :param event: pygame.event.Event
-        :type event: pygame.event.Event
-        '''
-        print(event.pos, "Do you want to play?")
+        self.main.change_state("in game")
 
     def on_leaderboard_click(self, event: pygame.event.Event):
-        '''
-        It prints a message when the user clicks on the leaderboard button.
-
-        :param event: pygame.event.Event
-        :type event: pygame.event.Event
-        '''
         print(event.pos, "Do you want to see the best score?")
