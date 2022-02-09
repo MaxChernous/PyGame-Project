@@ -3,6 +3,7 @@ from random import randint
 
 import pygame
 import pytmx.pytmx
+import sqlite3
 
 from Entities.Player import Player
 from Helpers.helpers import load_image
@@ -214,9 +215,10 @@ class Boss(pygame.sprite.Sprite):
 
     def damage(self):
         self.health_points -= 1
-#        if self.health_points % 5 == 0:
-#            for _ in range(5):
-#                ...
+
+    #        if self.health_points % 5 == 0:
+    #            for _ in range(5):
+    #                ...
 
     def update(self):
         if self.health_points > 0:
@@ -354,6 +356,29 @@ def message(text, screen):
     screen.blit(text, (text_x, text_y))
 
 
+def show_stopwatch(stopwatch, screen):
+    font = pygame.font.Font(None, 20)
+    text = font.render(stopwatch, True, (150, 200, 255))
+    text_w = text.get_width()
+    text_h = text.get_height()
+    pygame.draw.rect(screen, "black", (5, 5, text_w + 10, text_h + 10))
+    screen.blit(text, (10, 10))
+
+
+def write_result(stopwatch):
+    con = sqlite3.connect("best_results.sqlite")
+    cur = con.cursor()
+    result = cur.execute(f'''SELECT time FROM records
+                            WHERE time > {stopwatch}''').fetchall()
+    if result:
+        cur.execute(f'''UPDATE records
+                    SET time = "{stopwatch}"
+                    WHERE title = "the best result"
+                    ''')
+    con.commit()
+    con.close()
+
+
 def drw_line(line_sprite, screen):
     line_sprite.update(screen)
     line_sprite.draw(screen)
@@ -406,7 +431,8 @@ def main():
                         game.boss_attack()
 
                 if event.type == STOPWATCH_EVENT_TYPE:
-                    stopwatch += 1
+                    if not game_over:
+                        stopwatch += 1
 
             all_sprites.update(screen)
 
@@ -449,6 +475,7 @@ def main():
             else:
                 game_over = True
                 message("You win! :)", screen)
+                write_result(stopwatch)
 
         if game.check_lose():
             game_over = True
@@ -467,6 +494,7 @@ def main():
         line_sprite.draw(screen)
         players.update(screen)
         players.draw(screen)
+        show_stopwatch(stopwatch, screen)
 
         pygame.display.flip()
     pygame.quit()
