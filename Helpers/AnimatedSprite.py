@@ -4,7 +4,7 @@ import pygame
 
 
 class AnimatedSprite(pygame.sprite.Sprite):
-    def __init__(self, sheet, columns, rows, x, y, *groups, stages=None):
+    def __init__(self, sheet, columns, rows, x, y, *groups, stages=None, frame_per_second=0):
         super().__init__(*groups)
         self.frames = []
         self.stopped = False
@@ -19,6 +19,12 @@ class AnimatedSprite(pygame.sprite.Sprite):
         self.rect = self.rect.move(x, y)
         self.x_flipped = False
         self.y_flipped = False
+        self.clock = pygame.time.Clock()
+        self.timer = 0
+        if frame_per_second:
+            self.fps = frame_per_second
+        else:
+            self.fps = 1000
 
     def cut_sheet(self, sheet, columns, rows):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
@@ -30,8 +36,10 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     frame_location, self.rect.size)))
 
     def update(self, *args):
-        if self.stopped:
+        self.timer += self.clock.tick()
+        if self.stopped or self.timer < 1000 / self.fps:
             return
+        self.timer = 0
         self.cur_frame = (self.cur_frame + 1) % (self.stages[self.stage][1] - self.stages[self.stage][0])
         self.image = pygame.transform.flip(self.frames[self.cur_frame + self.stages[self.stage][0]], self.x_flipped,
                                            self.y_flipped)
@@ -44,7 +52,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
 
 def load_image(name):
-    fullname = path.join('../data', name)
+    fullname = path.join('..\\data', name)
     if not path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         exit()

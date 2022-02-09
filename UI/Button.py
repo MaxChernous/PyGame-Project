@@ -13,7 +13,7 @@ class Button(pygame.sprite.Sprite):
         *groups: AbstractGroup,
         image: "Optional[pygame.surface.Surface]" = None,
         text: "pygame.surface.Surface" = pygame.Surface([0, 0]),
-        rect: "Optional[pygame.rect.Rect]" = None
+        rect: "Optional[pygame.rect.Rect]" = None,
     ):
         self.btn_color, self.btn_text = color, text
         super().__init__(*groups)
@@ -38,9 +38,9 @@ class Button(pygame.sprite.Sprite):
     def add_on_btn_down(self, method: Any):
         '''
         Add a method to the list of methods that are called when the button is pushed.
-        
+
         The method is passed the button as an argument.
-        
+
         :param method: The method to be called when the button is pushed
         :type method: Any
         '''
@@ -49,7 +49,7 @@ class Button(pygame.sprite.Sprite):
     def add_on_btn_up(self, method: Any):
         '''
         Add a method to the list of methods that are called when the button is clicked.
-        
+
         :param method: The method to be called when the button is clicked
         :type method: Any
         '''
@@ -61,16 +61,15 @@ class Button(pygame.sprite.Sprite):
     #     hsv = self.btn_color.hsva
     #     # self.color.hsva = (hsv[0], hsv[1], hsv[2] - 15, hsv[3])
 
-    def update(self, *args: Any, **kwargs: Any):
+    def update(self, event=None):
         '''
         If the button is clicked, it will call the functions in the pushed list.
-        
+
         :param : *args: Any
         :type : Any
         :param : *args: Any
         :type : Any
         '''
-        event: pygame.event.Event = args[0]
         if event:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.first and self.check_click_position(event.pos):
@@ -86,7 +85,7 @@ class Button(pygame.sprite.Sprite):
     def draw(self, screen: pygame.surface.Surface):
         '''
         Draw the text on the button.
-        
+
         :param screen: The screen to draw the button on
         :type screen: pygame.surface.Surface
         '''
@@ -95,7 +94,7 @@ class Button(pygame.sprite.Sprite):
     def move_to(self, x: int, y: int):
         '''
         Move the button to the given x and y coordinates.
-        
+
         :param x: The x-coordinate of the top-left corner of the rectangle
         :type x: int
         :param y: int - The y coordinate of the top left corner of the rectangle
@@ -107,7 +106,7 @@ class Button(pygame.sprite.Sprite):
     def set_sprite(self, sprite: pygame.surface.Surface):
         '''
         Set the sprite of an object.
-        
+
         :param sprite: The sprite to be drawn
         :type sprite: pygame.surface.Surface
         '''
@@ -116,7 +115,7 @@ class Button(pygame.sprite.Sprite):
     def check_click_position(self, pos: "tuple[int, int]"):
         '''
         If the mouse is within the bounds of the button, return True.
-        
+
         :param pos: The position of the click
         :type pos: "tuple[int, int]"
         :return: The position of the click relative to the button.
