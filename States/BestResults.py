@@ -61,7 +61,7 @@ class BestResults:
         rect.x += self.cell_width
         self.cells.append(Cell(pygame.Rect(rect), "Was played", self.color, self.all_sprites))
         rect.x = self.x
-        for i in self.requester.get_all_results()[:10]:
+        for i in sorted(self.requester.get_all_results())[:10]:
             rect.y += self.cell_height
             self.cells.append(Cell(pygame.Rect(rect), str(i[0]), self.color, self.all_sprites))
             rect.x += self.cell_width

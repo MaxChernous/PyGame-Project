@@ -269,9 +269,9 @@ class Game:
             if self.labyrinth.is_free((next_x, next_y + 1)):
                 next_y += 1
                 pushed = True
-        if pushed:
+        if pushed and not self.hero.stage == "Attack":
             self.hero.stage = "Walk"
-        else:
+        elif not self.hero.stage == "Attack":
             self.hero.stage = "Idle"
         self.hero.set_position((next_x, next_y))
 
@@ -419,9 +419,15 @@ def main():
                 hero, [enemy1, enemy2, enemy3, enemy4], screen)
     level = 1
 
+    score = pygame.time.Clock()
+    number_score = 0
+    timer = pygame.time.Clock()
+    cooldown = 1000  # time before game closes
+
     running = True
     game_over = False
     while running:
+        number_score += score.tick()
         game.labyrinth.render(screen)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -495,14 +501,23 @@ def main():
                 level = 3
 
             else:
+                if not game_over:
+                    timer.tick()
                 game_over = True
                 mess = "You win! :)"
-                # write_result(stopwatch)
+                cooldown -= timer.tick()
+                if cooldown < 0:
+                    return "win", (number_score + score.tick()) // 100
 
         if game.check_lose():
+            if not game_over:
+                timer.tick()
             game_over = True
             hero.stage = "Die"
             mess = "You lose! :("
+            cooldown -= timer.tick()
+            if cooldown < 0:
+                return "Loose", (number_score + score.tick()) // 100
 
         if not game_over:
             game.update()
@@ -520,7 +535,7 @@ def main():
 
         players.update(screen)
         players.draw(screen)
-        show_stopwatch(stopwatch, screen)
+        show_stopwatch(number_score / 1000, screen)
 
         if pygame.mouse.get_focused():
             cursors.draw(screen)

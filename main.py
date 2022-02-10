@@ -54,7 +54,7 @@ if __name__ == '__main__':
                 end_screen = loose_screen
             else:
                 end_screen = win_screen
-            requester.add_new_result(game_result[1], str(datetime.now().strftime("%D %H:%M:%S")))
+                requester.add_new_result(game_result[1], str(datetime.now().strftime("%D %H:%M:%S")))
             best_result_screen.item_changed()
             screen = pygame.display.set_mode(size)
             end_screen.set_score(game_result[1])
