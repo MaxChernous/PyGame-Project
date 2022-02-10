@@ -3,7 +3,7 @@
  <tileset firstgid="1" source="tmw_desert_spacing.tsx"/>
  <layer id="1" name="Слой тайлов 1" width="21" height="19">
   <data encoding="base64" compression="zlib">
-   eJxTYWBg0KIiVgViZSCWoyJWHDVz1MxRM0fNpJKZkkAshYSlqWCmJgN1ykBsftegMExAenXQ/AzCujjEicEgvQCyLzBf
+   eJxTYWBg0KIiVgViZSCWoxLWA2JFPGbKE9CPS34kmIkL4zOTXEwNM9H9Q4yZkkAsBcXSVDITpEYJirGpJcdMTQZEHtEmMTzl0fBAxRE2dxBjJqluBpmpgxSv2OKWHDNVGFDLKvR4IMdMWvgd2UxJLH4nJ96Rw1MXS/iSikFmAADn7jCs
   </data>
  </layer>
 </map>
