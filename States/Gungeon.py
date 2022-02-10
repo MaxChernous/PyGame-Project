@@ -484,10 +484,11 @@ def main():
                 labyrinth3 = Labyrinth("map3.tmx", [])
                 hero.set_position((2, 17))
                 for enemy in game.enemies:
-                    enemy.delay = 25
-                    enemy.life = True
-                    enemy.triggered = False
-                    enemy.radius_trigger = 7
+                    enemy.kill()
+                    # enemy.delay = 25
+                    # enemy.life = True
+                    # enemy.triggered = False
+                    # enemy.radius_trigger = 7
 
                 enemy1.set_position((3, 18))
                 enemy2.set_position((6, 12))
