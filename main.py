@@ -36,11 +36,17 @@ if __name__ == '__main__':
     win_end_image = pygame.transform.scale(load_image("win_end_image.png"), (height / 10 * 8, height))
 
     menu = MainMenu(screen, main=main)
-    win_screen = EndScreen(screen, "Congrats", win_end_image, 10, main=main, won=True)  # TODO : text for winning
+    win_screen = EndScreen(screen, "Congratulations!", win_end_image, 10, main=main, won=True)
     loose_screen = EndScreen(screen, "You lost! Nice try", win_end_image, 20, main=main,
                              won=False)  # TODO : text and image for losing
     end_screen = loose_screen
 
+    # Background music
+    background_music_in_game = "data\\background_music.wav"
+    menu_music = "data\\menu_music.mp3"
+
+    pygame.mixer.music.load(menu_music)
+    pygame.mixer.music.play()
     while running:
         screen.fill('black')
         if main.game_state == "main menu":
@@ -48,6 +54,8 @@ if __name__ == '__main__':
         if main.game_state == "best results":
             best_result_screen.display(screen)
         if main.game_state == "in game":
+            pygame.mixer.music.load(background_music_in_game)
+            pygame.mixer.music.play(-1)
             game_result = Gungeon.main()
             main.change_state("end game")
             if game_result[0] == "Loose":
@@ -58,6 +66,9 @@ if __name__ == '__main__':
             best_result_screen.item_changed()
             screen = pygame.display.set_mode(size)
             end_screen.set_score(game_result[1])
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load(menu_music)
+            pygame.mixer.music.play()
         if main.game_state == "end game":
             end_screen.display(screen)
         for event in pygame.event.get():
