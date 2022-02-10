@@ -1,18 +1,34 @@
 import os
+import sqlite3
+from random import randint
 
 import pygame
 import pytmx.pytmx
 
 from Entities.Player import Player
+from Helpers.Bombs import Bomb
 from Helpers.helpers import load_image
+from UI.Cursor import Cursor
 
 SIZE = WIDTH, HEIGHT = 672, 608
+TILE_SIZE = 32
 FPS = 15
 MAPS_DIR = "maps"
-TILE_SIZE = 32
+
+FREE_TILES = [30, 31, 39, 40, 46]
+FINISH_TILE = 46
+NEW_WEAPON_TILE = 39
+CACTUS_TILE = 31
+
 ENEMY_EVENT_TYPE = 30
+BOSS_EVENT_TYPE = 40
+STOPWATCH_EVENT_TYPE = 50
+
+BOSS_DELAY = 2000
+STOPWATCH_DELAY = 1000
+
 PISTOL_SPRITE = 39
-RIFLE_SPRITE = 40
+
 GAME_RESULT = "WIN"
 
 
@@ -44,15 +60,15 @@ class Line(pygame.sprite.Sprite):
 
 class Labyrinth:
 
-    def __init__(self, filename, free_tiles, finish_tile, cactus_tile, enemies):
+    def __init__(self, filename, enemies):
         fullname = os.path.join(MAPS_DIR, filename)
         self.map = pytmx.load_pygame(fullname)
         self.height = self.map.height
         self.width = self.map.width
         self.tile_size = self.map.tilewidth
-        self.free_tiles = free_tiles
-        self.finish_tile = finish_tile
-        self.cactus_tile = cactus_tile
+        self.free_tiles = FREE_TILES
+        self.finish_tile = FINISH_TILE
+        self.cactus_tile = CACTUS_TILE
         self.enemies = enemies
 
     def render(self, screen):
@@ -104,9 +120,9 @@ class Labyrinth:
 
 
 class Hero(Player):
-    sword_image = load_image("hero_sword_image.png")
-    pistol_image = load_image("hero_pistol_image.png")
-    rifle_image = load_image("hero_rifle_image.png")
+    #    sword_image = load_image("hero_sword_image.png")
+    #    pistol_image = load_image("hero_pistol_image.png")
+    #    rifle_image = load_image("hero_rifle_image.png")
 
     INTERVAL = 120  # milliseconds between animation frame
     OFFSET_X = TILE_SIZE / 1.5
@@ -125,8 +141,6 @@ class Hero(Player):
         self.x = rect.x
         self.y = rect.y
 
-        print(rect.x, rect.y)
-
         super(Hero, self).__init__(picture, columns, rows, *groups, rect=rect, stages=stages)
 
         self.stage = "Idle"
@@ -139,12 +153,6 @@ class Hero(Player):
 
     def update(self, screen):
         super().update()
-        # if self.weapon == "Sword":
-        #     self.image = Hero.sword_image
-        # elif self.weapon == "Pistol":
-        #     self.image = Hero.pistol_image
-        # else:
-        #     self.image = Hero.rifle_image
 
         self.image = pygame.transform.scale(self.image, (TILE_SIZE * 2.5, TILE_SIZE * 2.5))
         self.rect.x = self.x * TILE_SIZE - self.OFFSET_X
@@ -193,31 +201,46 @@ class Boss(pygame.sprite.Sprite):
     life_image = load_image("boss_life_image.png")
     dead_image = load_image("boss_dead_image.png")
 
-    def __init__(self, group, position, delay, radius_trigger):
+    def __init__(self, group, position):
         super().__init__(group)
         self.image = Boss.life_image
-        self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
+        self.image = pygame.transform.scale(self.image, (TILE_SIZE * 4, TILE_SIZE * 3))
         self.rect = self.image.get_rect()
         self.x, self.y = position
         self.rect.x = self.x * TILE_SIZE
         self.rect.y = self.y * TILE_SIZE
-        self.delay = delay
-        pygame.time.set_timer(ENEMY_EVENT_TYPE, self.delay)
-        self.life = True
-        self.triggered = False
-        self.radius_trigger = radius_trigger
+        pygame.time.set_timer(BOSS_EVENT_TYPE, BOSS_DELAY)
+        self.health_points = 30
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def damage(self):
+        self.health_points -= 1
+
+    def update(self, screen):
+        if self.health_points > 0:
+            self.image = Boss.life_image
+        else:
+            self.image = Boss.dead_image
+
+        self.image = pygame.transform.scale(self.image, (TILE_SIZE * 4, TILE_SIZE * 3))
+        self.rect.x = self.x * TILE_SIZE
+        self.rect.y = self.y * TILE_SIZE
         self.mask = pygame.mask.from_surface(self.image)
 
 
 class Game:
 
-    def __init__(self, all_sprites, line_sprite, labyrinth, hero, enemies, screen):
+    def __init__(self, all_sprites, line_sprite, labyrinth, hero, enemies, screen, boss=None, bomb_sprites=None):
         self.all_sprites = all_sprites
         self.line_sprite = line_sprite
+        self.bomb_sprites = bomb_sprites
         self.labyrinth = labyrinth
         self.hero = hero
         self.enemies = enemies
         self.screen = screen
+        self.boss = boss
+        self.hero_is_dead = False
+        self.bombs = []
 
     def render(self, screen):
         self.labyrinth.render(screen)
@@ -232,32 +255,28 @@ class Game:
             if self.labyrinth.is_free((next_x - 1, next_y)):
                 self.hero.x_flipped = True
                 next_x -= 1
-                self.hero.stage = "Walk"
                 pushed = True
         if pygame.key.get_pressed()[pygame.K_d]:
             if self.labyrinth.is_free((next_x + 1, next_y)):
                 self.hero.x_flipped = False
                 next_x += 1
-                self.hero.stage = "Walk"
                 pushed = True
         if pygame.key.get_pressed()[pygame.K_w]:
             if self.labyrinth.is_free((next_x, next_y - 1)):
                 next_y -= 1
-                self.hero.stage = "Walk"
                 pushed = True
         if pygame.key.get_pressed()[pygame.K_s]:
             if self.labyrinth.is_free((next_x, next_y + 1)):
                 next_y += 1
-                self.hero.stage = "Walk"
                 pushed = True
-        if not pushed:
+        if pushed:
+            self.hero.stage = "Walk"
+        else:
             self.hero.stage = "Idle"
         self.hero.set_position((next_x, next_y))
 
         if self.labyrinth.get_tile_id(self.hero.get_position()) == PISTOL_SPRITE:
             self.hero.weapon = "Pistol"
-        elif self.labyrinth.get_tile_id(self.hero.get_position()) == RIFLE_SPRITE:
-            self.hero.weapon = "Rifle"
 
         for enemy in self.enemies:
             if ((enemy.get_position()[0] - self.hero.get_position()[0]) ** 2 + (
@@ -274,13 +293,25 @@ class Game:
                     break
 
         if self.hero.weapon == "Pistol":
-            hit_line = Line(self.line_sprite, self.screen, ((self.hero.get_position()[0] + 0.5) * TILE_SIZE,
-                                                            (self.hero.get_position()[1] + 0.5) * TILE_SIZE), event_pos)
+            hit_line = Line(self.line_sprite, self.screen,
+                            ((self.hero.get_position()[0] + 0.5) * TILE_SIZE,
+                             (self.hero.get_position()[1] + 0.5) * TILE_SIZE), event_pos)
 
             for enemy in self.enemies:
                 if pygame.sprite.collide_mask(hit_line, enemy):
                     enemy.life = False
                     break
+
+            if self.boss:
+                if pygame.sprite.collide_mask(hit_line, self.boss):
+                    self.boss.damage()
+
+    def boss_attack(self):
+        for y in range(1, 18):
+            for x in range(1, 20):
+                if randint(1, 30) == 1:
+                    if self.labyrinth.is_free((x, y), for_hero=False):
+                        self.bombs.append(Bomb((x, y), self.bomb_sprites))
 
     def move_enemy(self):
         for enemy in self.enemies:
@@ -290,14 +321,29 @@ class Game:
                 enemy.set_position(next_position)
 
     def check_end(self):
+        if self.boss:
+            if self.boss.health_points > 0:
+                return False
         return self.labyrinth.get_tile_id(self.hero.get_position()) == self.labyrinth.finish_tile
 
     def check_lose(self):
+        if self.boss:
+            for bomb in self.bombs:
+                if bomb.updates_count == 9:
+                    if abs(self.hero.get_position()[0] - bomb.x) <= 1 \
+                            and abs(self.hero.get_position()[1] - bomb.y) <= 1:
+                        self.hero_is_dead = True
+
+        if self.hero_is_dead:
+            return True
+
         if self.labyrinth.get_tile_id(self.hero.get_position()) == self.labyrinth.cactus_tile:
             return True
+
         for enemy in self.enemies:
             if self.hero.get_position() == enemy.get_position() and enemy.life:
                 return True
+
         return False
 
 
@@ -305,11 +351,34 @@ def message(text, screen):
     font = pygame.font.Font(None, 50)
     text = font.render(text, True, "white")
     text_x = (WIDTH - text.get_width()) // 2
-    text_y = (HEIGHT - text.get_height()) // 2
+    text_y = (HEIGHT - text.get_height()) // 2 - 100
     text_w = text.get_width()
     text_h = text.get_height()
     pygame.draw.rect(screen, "black", (text_x - 10, text_y - 10, text_w + 20, text_h + 20))
     screen.blit(text, (text_x, text_y))
+
+
+def show_stopwatch(stopwatch, screen):
+    font = pygame.font.Font(None, 20)
+    text = font.render(str(stopwatch), True, "white")
+    text_w = text.get_width()
+    text_h = text.get_height()
+    pygame.draw.rect(screen, "black", (5, 5, text_w + 10, text_h + 10))
+    screen.blit(text, (10, 10))
+
+
+def write_result(stopwatch):
+    con = sqlite3.connect("best_results.sqlite")
+    cur = con.cursor()
+    result = cur.execute(f'''SELECT time FROM records
+                            WHERE time > {stopwatch}''').fetchall()
+    if result:
+        cur.execute(f'''UPDATE records
+                    SET time = "{stopwatch}"
+                    WHERE title = "the best result"
+                    ''')
+    con.commit()
+    con.close()
 
 
 def drw_line(line_sprite, screen):
@@ -321,10 +390,16 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
     clock = pygame.time.Clock()
+    stopwatch = 0
 
     all_sprites = pygame.sprite.Group()
     players = pygame.sprite.Group()
     line_sprite = pygame.sprite.Group()
+    cursors = pygame.sprite.Group()
+    bomb_sprites = pygame.sprite.Group()
+
+    cursor = Cursor(pygame.transform.scale(
+        load_image("cursor.png"), (50, 50)), cursors)
 
     hero = Hero(load_image("player.png"), 8, 8, all_sprites, players,
                 rect=pygame.rect.Rect((1, 17), (TILE_SIZE, TILE_SIZE)),
@@ -333,12 +408,15 @@ def main():
                         "Attack": [35, 41],
                         "Silence": [41, 53],
                         "Die": [54, 64]}, weapon="Sword")
+
     enemy1 = Enemy(all_sprites, (4, 2), 100, 5)
     enemy2 = Enemy(all_sprites, (5, 17), 100, 5)
     enemy3 = Enemy(all_sprites, (8, 8), 100, 5)
     enemy4 = Enemy(all_sprites, (14, 4), 100, 3)
-    labyrinth1 = Labyrinth("map1.tmx", [30, 46, 31], 46, 31, [enemy1, enemy2, enemy3, enemy4])
-    game = Game(all_sprites, line_sprite, labyrinth1, hero, [enemy1, enemy2, enemy3, enemy4], screen)
+
+    labyrinth1 = Labyrinth("map1.tmx", [enemy1, enemy2, enemy3, enemy4])
+    game = Game(all_sprites, line_sprite, labyrinth1,
+                hero, [enemy1, enemy2, enemy3, enemy4], screen)
     level = 1
 
     running = True
@@ -349,17 +427,30 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
+            if event.type == pygame.MOUSEMOTION:
+                cursors.update(event.pos)
+
             if not game_over:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     game.hero_strike(event.pos)
 
                 if event.type == ENEMY_EVENT_TYPE:
                     game.move_enemy()
+
+                if event.type == BOSS_EVENT_TYPE:
+                    if game.boss:
+                        if game.boss.health_points > 0:
+                            game.boss_attack()
+
+                if event.type == STOPWATCH_EVENT_TYPE:
+                    if not game_over:
+                        stopwatch += 1
+
             all_sprites.update(screen)
 
         if game.check_end():
             if level == 1:
-                labyrinth2 = Labyrinth("map2.tmx", [30, 46, 31, 39], 46, 31, [enemy1, enemy2, enemy3, enemy4])
+                labyrinth2 = Labyrinth("map2.tmx", [enemy1, enemy2, enemy3, enemy4])
                 hero.set_position((1, 17))
                 enemy1.set_position((6, 17))
                 enemy2.set_position((3, 7))
@@ -375,38 +466,43 @@ def main():
                 enemy3.delay = 10
                 enemy4.delay = 10
 
-                enemy1.life = True
-                enemy2.life = True
-                enemy3.life = True
-                enemy4.life = True
+                for enemy in game.enemies:
+                    enemy.life = True
+                    enemy.triggered = False
 
-                enemy1.triggered = False
-                enemy2.triggered = False
-                enemy3.triggered = False
-                enemy4.triggered = False
-
-                game = Game(all_sprites, line_sprite, labyrinth2, hero, [enemy1, enemy2, enemy3, enemy4], screen)
+                game = Game(all_sprites, line_sprite, labyrinth2,
+                            hero, [enemy1, enemy2, enemy3, enemy4], screen)
                 level = 2
 
             elif level == 2:
-                labyrinth3 = Labyrinth("map3.tmx", [30, 46, 31, 40], 46, 40, [enemy1, enemy2, enemy3, enemy4])
-                hero.set_position((1, 17))
-                enemy.set_position((19, 2))
-                enemy.delay = 50
-                enemy.life = True
-                game = Game(labyrinth3, hero, enemy)
+                labyrinth3 = Labyrinth("map3.tmx", [])
+                hero.set_position((2, 17))
+                for enemy in game.enemies:
+                    enemy.delay = 25
+                    enemy.life = True
+                    enemy.triggered = False
+                    enemy.radius_trigger = 7
+
+                enemy1.set_position((3, 18))
+                enemy2.set_position((6, 12))
+                enemy3.set_position((15, 14))
+                enemy4.set_position((3, 6))
+
+                boss = Boss(all_sprites, (8, 8))
+
+                game = Game(all_sprites, line_sprite, labyrinth3,
+                            hero, [], screen, boss=boss, bomb_sprites=bomb_sprites)
                 level = 3
 
             else:
                 game_over = True
-                message("You win! :)", screen)
+                mess = "You win! :)"
+                # write_result(stopwatch)
 
         if game.check_lose():
             game_over = True
             hero.stage = "Die"
-            for enemy in game.enemies:
-                enemy = None
-            message("You lose :(", screen)
+            mess = "You lose! :("
 
         if not game_over:
             game.update()
@@ -418,9 +514,18 @@ def main():
 
         line_sprite.update(screen)
         line_sprite.draw(screen)
+
+        bomb_sprites.update(screen)
+        bomb_sprites.draw(screen)
+
         players.update(screen)
         players.draw(screen)
+        show_stopwatch(stopwatch, screen)
 
+        if pygame.mouse.get_focused():
+            cursors.draw(screen)
+        if game_over:
+            message(mess, screen)
         pygame.display.flip()
     pygame.quit()
 
