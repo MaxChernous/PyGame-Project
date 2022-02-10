@@ -340,6 +340,8 @@ def main():
     labyrinth1 = Labyrinth("map1.tmx", [30, 46, 31], 46, 31, [enemy1, enemy2, enemy3, enemy4])
     game = Game(all_sprites, line_sprite, labyrinth1, hero, [enemy1, enemy2, enemy3, enemy4], screen)
     level = 1
+    cooldown = 2000  # Time before the end screen, ms
+    timer = pygame.time.Clock()  # timer to count time before showing theend screen
 
     running = True
     game_over = False
@@ -402,11 +404,17 @@ def main():
                 message("You win! :)", screen)
 
         if game.check_lose():
+            if not game_over:
+                timer.tick()
             game_over = True
             hero.stage = "Die"
             for enemy in game.enemies:
                 enemy = None
+            cooldown -= timer.tick()
+            print(cooldown)
             message("You lose :(", screen)
+            if cooldown < 0:
+                return "Loose", 1000
 
         if not game_over:
             game.update()
