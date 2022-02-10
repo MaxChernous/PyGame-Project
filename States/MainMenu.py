@@ -84,6 +84,16 @@ class MainMenu:
         self.menu_image.rect.x = 720
         self.menu_image.rect.y = 235
 
+        # Music by
+        music_text = pygame.font.Font(None, 30).render(
+            "Music by Hamzin", True, (100, 255, 100))
+        music_text_x, music_text_y = 50, height - music_text.get_height() - 50
+        self.music_text_sprite = pygame.sprite.Sprite(self.all_sprites)
+        self.music_text_sprite.image = music_text
+        self.music_text_sprite.rect = music_text.get_rect()
+        self.music_text_sprite.rect.x = music_text_x
+        self.music_text_sprite.rect.y = music_text_y
+
     def display(self, screen: pygame.surface.Surface):
         '''
         It draws all the sprites in the group to the screen.
