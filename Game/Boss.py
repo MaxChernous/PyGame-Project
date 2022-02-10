@@ -16,7 +16,7 @@ class Boss(pygame.sprite.Sprite):
         self.rect.x = self.x * TILE_SIZE
         self.rect.y = self.y * TILE_SIZE
         pygame.time.set_timer(BOSS_EVENT_TYPE, BOSS_DELAY)
-        self.health_points = 30
+        self.health_points = 40
         self.mask = pygame.mask.from_surface(self.image)
 
     def damage(self):
