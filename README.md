@@ -10,4 +10,4 @@ TODO: Write about project
 ## Requirements:
 - PyGame >= 2.1.2
 - PyTMX >= 3.31
-- - Python >= 3.8
+- Python >= 3.8
