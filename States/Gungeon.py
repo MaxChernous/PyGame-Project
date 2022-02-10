@@ -85,7 +85,7 @@ class Game:
                              (self.hero.get_position()[1] + 0.5) * TILE_SIZE), event_pos)
 
             for enemy in self.enemies:
-                if pygame.sprite.collide_mask(hit_line, enemy):
+                if pygame.sprite.collide_mask(hit_line, enemy) and enemy.triggered:
                     enemy.life = False
                     break
 
