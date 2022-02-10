@@ -309,7 +309,7 @@ class Game:
     def boss_attack(self):
         for y in range(1, 18):
             for x in range(1, 20):
-                if randint(1, 30) == 1:
+                if randint(1, 20) == 1:
                     if self.labyrinth.is_free((x, y), for_hero=False):
                         self.bombs.append(Bomb((x, y), self.bomb_sprites))
 
