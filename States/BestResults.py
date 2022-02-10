@@ -42,6 +42,12 @@ class BestResults:
             rect.x += self.cell_width
             self.cells.append(Cell(pygame.Rect(rect), str(i[1]), self.color, self.all_sprites))
             rect.x = self.x
+        if len(self.cells) < 3:
+            rect.y += self.cell_height
+            self.cells.append(Cell(pygame.Rect(rect), "Here will be your score", self.color, self.all_sprites))
+            rect.x += self.cell_width
+            self.cells.append(Cell(pygame.Rect(rect), "Here will be time", self.color, self.all_sprites))
+            rect.x = self.x
 
     def display(self, screen):
         self.all_sprites.draw(screen)
