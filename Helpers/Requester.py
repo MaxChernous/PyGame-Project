@@ -4,7 +4,7 @@ import sqlite3
 
 class Requester:
     def __init__(self, db_name):
-        self.connection = sqlite3.connect("..\\data\\" + db_name)
+        self.connection = sqlite3.connect("data\\" + db_name)
         self.cursor = self.connection.cursor()
 
     def get_all_results(self):

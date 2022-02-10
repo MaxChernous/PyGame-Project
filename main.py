@@ -1,6 +1,8 @@
 import pygame
+from datetime import datetime
 
 from Helpers.helpers import load_image
+from States.BestResults import BestResults
 from States.EndScreen import EndScreen
 from States.MainMenu import MainMenu
 from States import Gungeon
@@ -28,7 +30,8 @@ if __name__ == '__main__':
     pygame.mouse.set_visible(False)
     running = True
     main = Main()
-    main.game_state = "end game"
+    best_result_screen = BestResults(screen, main=main)
+    requester = best_result_screen.requester
 
     win_end_image = pygame.transform.scale(load_image("win_end_image.png"), (height / 10 * 8, height))
 
@@ -42,6 +45,8 @@ if __name__ == '__main__':
         screen.fill('black')
         if main.game_state == "main menu":
             menu.display(screen)
+        if main.game_state == "best results":
+            best_result_screen.display(screen)
         if main.game_state == "in game":
             game_result = Gungeon.main()
             main.change_state("end game")
@@ -49,6 +54,8 @@ if __name__ == '__main__':
                 end_screen = loose_screen
             else:
                 end_screen = win_screen
+            requester.add_new_result(game_result[1], str(datetime.now().strftime("%D %H:%M:%S")))
+            best_result_screen.item_changed()
             screen = pygame.display.set_mode(size)
             end_screen.set_score(game_result[1])
         if main.game_state == "end game":
@@ -63,6 +70,8 @@ if __name__ == '__main__':
                 menu.update(event)
             if main.game_state == "end game":
                 end_screen.update(event)
+            if main.game_state == "best results":
+                best_result_screen.update(event)
         if main.game_state == "end game":
             end_screen.update()
         all_sprites.draw(screen)

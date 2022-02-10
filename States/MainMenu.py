@@ -65,7 +65,7 @@ class MainMenu:
 
         # leaderboard button
         leaderboard_btn_text = pygame.font.Font(None, 45).render(
-            "Leaderboard", True, (100, 255, 100))
+            "Best Results", True, (100, 255, 100))
         leaderboard_btn_text_w, leaderboard_btn_text_h = leaderboard_btn_text.get_width(
         ), leaderboard_btn_text.get_height()
         leaderboard_btn_x = width // 2 - leaderboard_btn_text_w // 2 - 260
@@ -100,4 +100,4 @@ class MainMenu:
         self.main.change_state("in game")
 
     def on_leaderboard_click(self, event: pygame.event.Event):
-        print(event.pos, "Do you want to see the best score?")
+        self.main.change_state("best results")
