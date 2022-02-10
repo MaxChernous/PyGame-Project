@@ -232,25 +232,25 @@ class Game:
             if self.labyrinth.is_free((next_x - 1, next_y)):
                 self.hero.x_flipped = True
                 next_x -= 1
-                self.hero.stage = "Walk"
+                self.hero.stage = "Walk" if self.hero.stage == "Idle" else self.hero.stage
                 pushed = True
         if pygame.key.get_pressed()[pygame.K_d]:
             if self.labyrinth.is_free((next_x + 1, next_y)):
                 self.hero.x_flipped = False
                 next_x += 1
-                self.hero.stage = "Walk"
+                self.hero.stage = "Walk" if self.hero.stage == "Idle" else self.hero.stage
                 pushed = True
         if pygame.key.get_pressed()[pygame.K_w]:
             if self.labyrinth.is_free((next_x, next_y - 1)):
                 next_y -= 1
-                self.hero.stage = "Walk"
+                self.hero.stage = "Walk" if self.hero.stage == "Idle" else self.hero.stage
                 pushed = True
         if pygame.key.get_pressed()[pygame.K_s]:
             if self.labyrinth.is_free((next_x, next_y + 1)):
                 next_y += 1
-                self.hero.stage = "Walk"
+                self.hero.stage = "Walk" if self.hero.stage == "Idle" else self.hero.stage
                 pushed = True
-        if not pushed:
+        if not pushed and self.hero.stage == "Walk":
             self.hero.stage = "Idle"
         self.hero.set_position((next_x, next_y))
 
